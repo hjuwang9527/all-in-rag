@@ -8,18 +8,21 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_deepseek import ChatDeepSeek
+from rich.console import Console
+from rich.markdown import Markdown
+
 
 load_dotenv()
 
 
-markdown_path = "/workspaces/all-in-rag/data/C1/markdown/easy-rl-chapter1.md1"
+markdown_path = "/workspaces/all-in-rag/data/C1/markdown/easy-rl-chapter1.md"
 
 # 加载本地markdown文件
 loader = UnstructuredMarkdownLoader(markdown_path)
 docs = loader.load()
 
 # 文本分块
-text_splitter = RecursiveCharacterTextSplitter()
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 chunks = text_splitter.split_documents(docs)
 
 # for chunk in chunks:
@@ -67,4 +70,6 @@ docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
 
 
 answer = llm.invoke(prompt.format(question=question, context=docs_content))
-print(answer)
+# print(answer)
+console = Console()
+console.print(Markdown(str(answer)))
